@@ -36,10 +36,14 @@ class BitaBoxEntreprise(models.Model):
 
 class BitaBoxLead(models.Model):
     STATUTS = [
-        ("nouveau", "Nouveau"),
-        ("en_cours", "En cours"),
-        ("converti", "Converti"),
-        ("perdu", "Perdu"),
+        ("new", "New"),
+        ("no_answer", "No Answer"),
+        ("not_interested", "Not interested"),
+        ("call_back", "Call Back"),
+        ("wrong_number", "Wrong Number"),
+        ("wrong_info", "Wrong Info"),
+        ("hung_up", "Hung Up"),
+        ("never_answer", "Never Answer"),
     ]
     id = models.AutoField(primary_key=True)
     entreprise = models.ForeignKey(BitaBoxEntreprise, on_delete=models.CASCADE, related_name="leads")
@@ -48,9 +52,10 @@ class BitaBoxLead(models.Model):
     source = models.CharField(max_length=255)
     contact = models.CharField(max_length=100)
     email = models.EmailField(blank=True, null=True)
-    statut = models.CharField(max_length=10, choices=STATUTS, default="nouveau")
+    statut = models.CharField(max_length=100, choices=STATUTS, default="new")
     date_reception = models.DateTimeField(auto_now_add=True)
     commercial = models.ForeignKey(BitaBoxUtilisateur, on_delete=models.SET_NULL, null=True, blank=True)
+    commentaire = models.CharField(max_length=255)
 
     def __str__(self):
         return f"Lead de {self.contact} - {self.statut}"
@@ -60,11 +65,11 @@ class BitaBoxNotification(models.Model):
         ('unread', 'Non lue'),
         ('read', 'Lue'),
     ]
-
+    
     EVENT_TYPES = [
-        ('new_lead', 'Nouveau lead'),
-        ('lost_lead', 'Lead perdu'),
-        ('new_entreprise', 'Nouvelle entreprise'),
+        ('new_lead', 'New lead'),
+        ('lost_lead', 'Lost Lead'),
+        ('converti_lead', 'Converted Lead'),
     ]
 
     id = models.AutoField(primary_key=True)
