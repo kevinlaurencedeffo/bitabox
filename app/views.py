@@ -7,6 +7,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import make_password
 
 
+class IsAdminOrSuperuser(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and (request.user.is_admin or request.user.is_superuser)
+
+
 # Inscription
 class RegisterView(generics.CreateAPIView):
     queryset = BitaBoxUtilisateur.objects.all()
@@ -60,12 +65,12 @@ class ListeUtilisateursView(generics.ListAPIView):
     """Liste tous les utilisateurs"""
     queryset = BitaBoxUtilisateur.objects.all()
     serializer_class = UtilisateurSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAdminOrSuperuser]
 
 class CreerUtilisateurView(generics.CreateAPIView):
     """Créer un nouvel utilisateur"""
     serializer_class = UtilisateurSerializer
-    permission_classes = [permissions.IsAdminUser]  # Seuls les admins peuvent créer des utilisateurs
+    permission_classes = [IsAdminOrSuperuser]  # Seuls les admins peuvent créer des utilisateurs
 
     def perform_create(self, serializer):
         password = serializer.validated_data.get("password")
@@ -75,7 +80,7 @@ class DetailUtilisateurView(generics.RetrieveUpdateDestroyAPIView):
     """Voir, mettre à jour ou supprimer un utilisateur"""
     queryset = BitaBoxUtilisateur.objects.all()
     serializer_class = UtilisateurSerializer
-    permission_classes = [permissions.IsAdminUser]  # Seuls les admins peuvent modifier/supprimer
+    permission_classes = [IsAdminOrSuperuser]  # Seuls les admins peuvent modifier/supprimer
 
 class ChangePasswordView(APIView):
     """Changer le mot de passe d'un utilisateur"""
@@ -96,12 +101,12 @@ class ChangePasswordView(APIView):
 class EntrepriseListCreateView(generics.ListCreateAPIView):
     queryset = BitaBoxEntreprise.objects.all()
     serializer_class = EntrepriseSerializer
-    permission_classes = [permissions.IsAuthenticated]  # 🔒 Auth obligatoire
+    permission_classes = [IsAdminOrSuperuser]  # 🔒 Auth obligatoire
 
 class EntrepriseRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = BitaBoxEntreprise.objects.all()
     serializer_class = EntrepriseSerializer
-    permission_classes = [permissions.IsAuthenticated]  # 🔒 Auth obligatoire
+    permission_classes = [IsAdminOrSuperuser]  # 🔒 Auth obligatoire
 
 # 🎯 Gestion des leads
 class LeadListCreateView(generics.ListCreateAPIView):
