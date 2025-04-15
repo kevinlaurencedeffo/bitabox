@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app',
+    'bita_app',
     'rest_framework',
     'corsheaders',
     'rest_framework_simplejwt',
@@ -163,4 +163,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Chemin où les fichiers téléch
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = "app.BitaBoxUtilisateur"
+AUTH_USER_MODEL = "bita_app.BitaBoxUtilisateur"
