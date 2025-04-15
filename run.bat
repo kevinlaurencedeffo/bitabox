@@ -1,2 +1,3 @@
     @REM call python -m venv venv
-    @REM call venv\Scripts\activate
+    call venv\Scripts\activate
+    call python manage.py runserver
