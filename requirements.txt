@@ -3,3 +3,4 @@ Django==5.0.8
 django_cors_headers==4.4.0
 djangorestframework_simplejwt==5.3.1
 rest_framework_simplejwt==0.0.2
+django-filter==24.3
