@@ -10,7 +10,6 @@ from django.db.models import Count,Q
 from django.contrib.auth.models import Group
 
 
-
 class TraductionAPIView(APIView):
     permission_classes = [permissions.AllowAny]
     def post(self, request, langue_source, langue_cible):
