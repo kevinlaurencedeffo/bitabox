@@ -30,4 +30,11 @@ urlpatterns = [
     path('notifications/<int:pk>/read/', MarkNotificationAsReadView.as_view(), name='mark-notification-read'),
     path('notifications/<int:pk>/delete/', NotificationDeleteView.as_view(), name='notification-delete'),
 
+
+    path('traduction/<str:langue_source>/<str:langue_cible>/', TraductionAPIView.as_view(), name='traduction'),
+
+    path('dashboard/stats/', DashboardStatsView.as_view(), name='dashboard-stats'),
+
+
+
 ]

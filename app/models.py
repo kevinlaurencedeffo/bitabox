@@ -20,6 +20,9 @@ class BitaBoxUtilisateur(AbstractUser):
         related_name="utilisateur_permissions",  # ✅ Évite le conflit
         blank=True
     )
+    class Meta:
+        verbose_name = "Bitabox Utilisateur"
+        verbose_name_plural = "Bitabox Utilisateurs"
     
 
     def __str__(self):
@@ -30,6 +33,9 @@ class BitaBoxEntreprise(models.Model):
     nom = models.CharField(max_length=255)
     logo = models.ImageField(upload_to="logos/", blank=True, null=True)
     date_creation = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        verbose_name = "Bitabox Entreprise"
+        verbose_name_plural = "Bitabox Entreprises"
 
     def __str__(self):
         return self.nom
@@ -57,6 +63,10 @@ class BitaBoxLead(models.Model):
     commercial = models.ForeignKey(BitaBoxUtilisateur, on_delete=models.SET_NULL, null=True, blank=True)
     commentaire = models.CharField(max_length=255)
 
+    class Meta:
+        verbose_name = "Bitabox Lead"
+        verbose_name_plural = "Bitabox Leads"
+
     def __str__(self):
         return f"Lead de {self.contact} - {self.statut}"
 
@@ -78,6 +88,9 @@ class BitaBoxNotification(models.Model):
     message = models.TextField()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='unread')
     created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        verbose_name = "Bitabox Notification"
+        verbose_name_plural = "Bitabox Notifications"
 
     def __str__(self):
         return f"{self.get_event_type_display()} - {self.user.email}"
