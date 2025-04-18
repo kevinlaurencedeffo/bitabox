@@ -55,13 +55,13 @@ class EntrepriseSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Comment
+        model = BitaboxComment
         fields = "__all__"
 
 
 class LeadSerializer(serializers.ModelSerializer):
     comments = serializers.PrimaryKeyRelatedField(
-        queryset=Comment.objects.all(),
+        queryset=BitaboxComment.objects.all(),
         many=True,
         required=False
     )

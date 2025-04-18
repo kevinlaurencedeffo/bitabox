@@ -44,7 +44,7 @@ class BitaBoxEntreprise(models.Model):
         return self.name
 
 
-class Comment(models.Model):
+class BitaboxComment(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(BitaBoxUtilisateur, on_delete=models.CASCADE)
     message = models.TextField()
@@ -95,7 +95,7 @@ class BitaBoxLead(models.Model):
     id_lead = models.CharField(max_length=8, default=generate_lead_id, editable=False, unique=True)
 
     # ✅ Comments relation
-    comments = models.ManyToManyField(Comment, related_name="lead_comments", blank=True)
+    comments = models.ManyToManyField(BitaboxComment, related_name="lead_comments", blank=True)
 
     class Meta:
         verbose_name = "Bitabox Lead"

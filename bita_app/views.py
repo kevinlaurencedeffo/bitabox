@@ -298,7 +298,7 @@ class AddLeadView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CommentListCreateView(generics.ListCreateAPIView):
-    queryset = Comment.objects.all()
+    queryset = BitaboxComment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -306,6 +306,6 @@ class CommentListCreateView(generics.ListCreateAPIView):
         serializer.save(user=self.request.user)
 
 class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Comment.objects.all()
+    queryset = BitaboxComment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticated]
