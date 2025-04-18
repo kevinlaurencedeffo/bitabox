@@ -76,12 +76,12 @@ class UtilisateursParEntrepriseView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]  # Seuls les utilisateurs connectés peuvent accéder
 
     def get_queryset(self):
-        entreprise_id = self.kwargs.get("entreprise_id")
+        entreprise_id = self.kwargs.get("entreprise")
         return BitaBoxUtilisateur.objects.filter(enterprise=entreprise_id)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        entreprise = BitaBoxEntreprise.objects.get(id=self.kwargs["entreprise_id"])
+        entreprise = BitaBoxEntreprise.objects.get(id=self.kwargs["entreprise"])
         serializer = self.get_serializer(queryset, many=True)
         return Response({
             "entreprise": entreprise.name,
@@ -164,12 +164,12 @@ class LeadByEntrepriseView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]  # Seuls les utilisateurs connectés peuvent voir les leads
 
     def get_queryset(self):
-        entreprise_id = self.kwargs.get("entreprise_id")  # Récupérer l'ID de l'entreprise depuis l'URL
+        entreprise_id = self.kwargs.get("entreprise")  # Récupérer l'ID de l'entreprise depuis l'URL
         return BitaBoxLead.objects.filter(enterprise=entreprise_id)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        entreprise = BitaBoxEntreprise.objects.get(id=self.kwargs["entreprise_id"])
+        entreprise = BitaBoxEntreprise.objects.get(id=self.kwargs["entreprise"])
         serializer = self.get_serializer(queryset, many=True)
         return Response({"entreprise": entreprise.name, "leads": serializer.data})
 
