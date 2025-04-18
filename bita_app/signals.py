@@ -15,7 +15,7 @@ def handle_lead_events(sender, instance, created, **kwargs):
     if created:
         BitaBoxNotification.objects.create(
             user=instance.commercial,
-            event_type='new_lead',
+            event_type='new',
             message=f"New lead: {instance.name} {instance.surname}"
         )
     else:
