@@ -223,7 +223,7 @@ class DashboardStatsView(APIView):
                 'utilisateurs_count': utilisateurs_count,
                 'leads_count': leads_count,
                 'leads_by_status': list(leads_by_status),
-                'top_entreprises': list(top_entreprises.values('nom', 'lead_count')),
+                'top_entreprises': list(top_entreprises.values('name', 'lead_count')),
                 'notifications_count': notifications_count
             }
 
@@ -250,7 +250,7 @@ class DashboardStatsView(APIView):
                 'leads_by_status': list(leads_by_status),
                 'leads_by_commercial': list(leads_by_commercial),
                 'top_commercials': list(top_commercials),
-                'recent_leads': [{'nom': lead.nom, 'prenom': lead.prenom, 'statut': lead.statut} for lead in recent_leads]
+                'recent_leads': [{'name': lead.name, 'surname': lead.surname, 'statut': lead.statut} for lead in recent_leads]
             }
 
         # Commercial : accès à ses propres leads
@@ -269,7 +269,7 @@ class DashboardStatsView(APIView):
                 'total_leads_lost': lost,
                 'conversion_rate': conversion_rate,
                 'leads_by_status': list(leads_by_status),
-                'leads_to_follow_up': [{'nom': lead.nom, 'prenom': lead.prenom, 'contact': lead.contact} for lead in leads_to_follow_up]
+                'leads_to_follow_up': [{'name': lead.name, 'surname': lead.surname, 'contact': lead.contact} for lead in leads_to_follow_up]
             }
 
         return Response(stats)

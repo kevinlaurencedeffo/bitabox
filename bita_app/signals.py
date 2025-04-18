@@ -27,7 +27,7 @@ def handle_lead_events(sender, instance, created, **kwargs):
             'call_back': f"Call back requested for lead: {instance.name} {instance.surname}",
             'wrong_number': f"Wrong number for lead: {instance.name} {instance.surname}",
             'wrong_info': f"Incorrect info for lead: {instance.name} {instance.surname}",
-            'hung_up': f"Lead hung up: {instance.nom} {instance.name}",
+            'hung_up': f"Lead hung up: {instance.name} {instance.surname}",
             'never_answer': f"Lead never answers: {instance.name} {instance.surname}",
             'converti': f"Lead converted: {instance.name} {instance.surname}",
         }
