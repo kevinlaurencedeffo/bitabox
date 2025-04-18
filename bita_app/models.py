@@ -1,12 +1,15 @@
 from django.db import models
-# Create your models here.
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
+from django.utils import timezone
+import string
+import random
+
 
 
 class BitaBoxUtilisateur(AbstractUser):
     id = models.AutoField(primary_key=True)  # ✅ Auto-incrémentation
-    entreprise = models.ForeignKey("BitaBoxEntreprise", on_delete=models.CASCADE, null=True, blank=True)
+    enterprise = models.ForeignKey("BitaBoxEntreprise", on_delete=models.CASCADE, null=True, blank=True)
     is_admin = models.BooleanField(default=False)
     is_commercial = models.BooleanField(default=False)
 
@@ -30,7 +33,7 @@ class BitaBoxUtilisateur(AbstractUser):
 
 class BitaBoxEntreprise(models.Model):
     id = models.AutoField(primary_key=True)
-    nom = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
     logo = models.ImageField(upload_to="logos/", blank=True, null=True)
     date_creation = models.DateTimeField(auto_now_add=True)
     class Meta:
@@ -38,11 +41,33 @@ class BitaBoxEntreprise(models.Model):
         verbose_name_plural = "Bitabox Entreprises"
 
     def __str__(self):
-        return self.nom
+        return self.name
+
+
+class Comment(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(BitaBoxUtilisateur, on_delete=models.CASCADE)
+    message = models.TextField()
+    date = models.DateField(auto_now_add=True)
+    time = models.TimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Comment by {self.user.username} on {self.date} at {self.time}"
+    class Meta:
+        verbose_name = "Bitabox Comment"
+        verbose_name_plural = "Bitabox Comments"
+
+    def __str__(self):
+        return f"{self.user.username} - {self.date} {self.time}"
+    
+
+def generate_lead_id():
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
 class BitaBoxLead(models.Model):
-    STATUTS = [
-        ("new", "New"),
+    STATUS_CHOICES = [
+        ("new", "New Lead"),
+        ("init_call", "Initial Call"),
         ("no_answer", "No Answer"),
         ("not_interested", "Not interested"),
         ("call_back", "Call Back"),
@@ -51,25 +76,33 @@ class BitaBoxLead(models.Model):
         ("hung_up", "Hung Up"),
         ("never_answer", "Never Answer"),
     ]
+
     id = models.AutoField(primary_key=True)
-    entreprise = models.ForeignKey(BitaBoxEntreprise, on_delete=models.CASCADE, related_name="leads")
-    nom = models.CharField(max_length=255)
-    prenom = models.CharField(max_length=255)
+    enterprise = models.ForeignKey(BitaBoxEntreprise, on_delete=models.CASCADE, related_name="leads")
+    name = models.CharField(max_length=255)
+    surname = models.CharField(max_length=255)
     source = models.CharField(max_length=255)
     contact = models.CharField(max_length=100)
     email = models.EmailField(blank=True, null=True)
-    statut = models.CharField(max_length=100, choices=STATUTS, default="new")
-    date_reception = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=100, choices=STATUS_CHOICES, default="new")
     commercial = models.ForeignKey(BitaBoxUtilisateur, on_delete=models.SET_NULL, null=True, blank=True)
-    commentaire = models.CharField(max_length=255)
+
+    # ✅ Newly added fields
+    date = models.DateField(default=timezone.now)
+    time = models.TimeField(default=timezone.now)
+    country = models.CharField(max_length=100, blank=True, null=True)
+    language = models.CharField(max_length=100, blank=True, null=True)
+    id_lead = models.CharField(max_length=8, default=generate_lead_id, editable=False, unique=True)
+
+    # ✅ Comments relation
+    comments = models.ManyToManyField(Comment, related_name="lead_comments", blank=True)
 
     class Meta:
         verbose_name = "Bitabox Lead"
         verbose_name_plural = "Bitabox Leads"
 
     def __str__(self):
-        return f"Lead de {self.contact} - {self.statut}"
-
+        return f"Lead from {self.contact} - {self.status}"
 class BitaBoxNotification(models.Model):
     STATUS_CHOICES = [
         ('unread', 'Non lue'),

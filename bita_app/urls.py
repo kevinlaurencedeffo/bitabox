@@ -16,20 +16,22 @@ urlpatterns = [
     path("utilisateurs/creer/", CreerUtilisateurView.as_view(), name="creer_utilisateur"),
     path("utilisateurs/<int:pk>/", DetailUtilisateurView.as_view(), name="detail_utilisateur"),
     path("utilisateurs/changer-mdp/", ChangePasswordView.as_view(), name="changer_mot_de_passe"),
-
+    
     path('entreprises/', EntrepriseListCreateView.as_view(), name='entreprise-list-create'),
     path('entreprises/<int:pk>/', EntrepriseRetrieveUpdateDeleteView.as_view(), name='entreprise-detail'),
-
     # Routes pour les leads
     path('leads/', LeadListCreateView.as_view(), name='lead-list-create'),
     path('leads/<int:pk>/', LeadRetrieveUpdateDeleteView.as_view(), name='lead-detail'),
     path("leads/commercial/", LeadByCommercialView.as_view(), name="leads_by_commercial"),
     path("leads/entreprise/<int:entreprise_id>/", LeadByEntrepriseView.as_view(), name="leads_by_entreprise"),
+    path('addlead/', AddLeadView.as_view(), name='add_lead'),
+
+    path('leads/comments/', CommentListCreateView.as_view(), name='comment-list-create'),
+    path('leads/comments/<int:pk>/', CommentDetailView.as_view(), name='comment-detail'),
 
     path('notifications/', NotificationListView.as_view(), name='notification-list'),
     path('notifications/<int:pk>/read/', MarkNotificationAsReadView.as_view(), name='mark-notification-read'),
     path('notifications/<int:pk>/delete/', NotificationDeleteView.as_view(), name='notification-delete'),
-
 
     path('traduction/<str:langue_source>/<str:langue_cible>/', TraductionAPIView.as_view(), name='traduction'),
 

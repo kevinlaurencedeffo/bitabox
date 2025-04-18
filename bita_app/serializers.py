@@ -8,7 +8,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     class Meta:
         model = BitaBoxUtilisateur
-        fields = ["id", "username", "email", "password", "is_commercial","is_admin","entreprise"]
+        fields = ["id", "username", "email", "password", "is_commercial","is_admin","enterprise"]
 
     def create(self, validated_data):
         user = BitaBoxUtilisateur.objects.create_user(
@@ -53,10 +53,23 @@ class EntrepriseSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = "__all__"
+
+
 class LeadSerializer(serializers.ModelSerializer):
+    comments = serializers.PrimaryKeyRelatedField(
+        queryset=Comment.objects.all(),
+        many=True,
+        required=False
+    )
+
     class Meta:
         model = BitaBoxLead
         fields = "__all__"
+
 
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:

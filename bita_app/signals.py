@@ -10,36 +10,36 @@ User = get_user_model()
 @receiver(post_save, sender=BitaBoxLead)
 def handle_lead_events(sender, instance, created, **kwargs):
     if not instance.commercial:
-        return  # On ne peut pas notifier si aucun commercial n’est associé
+        return  # Cannot notify if no commercial is associated
 
     if created:
         BitaBoxNotification.objects.create(
             user=instance.commercial,
             event_type='new_lead',
-            message=f"Nouveau lead : {instance.nom} {instance.prenom}"
+            message=f"New lead: {instance.name} {instance.surname}"
         )
     else:
-        statut = instance.statut
+        statut = instance.status
         messages = {
-            'new': f"Lead réinitialisé : {instance.nom} {instance.prenom}",
-            'no_answer': f"Pas de réponse pour le lead : {instance.nom} {instance.prenom}",
-            'not_interested': f"Lead non intéressé : {instance.nom} {instance.prenom}",
-            'call_back': f"Rappel demandé pour le lead : {instance.nom} {instance.prenom}",
-            'wrong_number': f"Mauvais numéro pour le lead : {instance.nom} {instance.prenom}",
-            'wrong_info': f"Infos erronées pour le lead : {instance.nom} {instance.prenom}",
-            'hung_up': f"Le prospect a raccroché : {instance.nom} {instance.prenom}",
-            'never_answer': f"Le prospect ne répond jamais : {instance.nom} {instance.prenom}",
-            'converti': f"Lead converti : {instance.nom} {instance.prenom}",
+            'Initial Call': f"Lead initialized: {instance.name} {instance.surname}",
+            'no_answer': f"No answer from lead: {instance.name} {instance.surname}",
+            'not_interested': f"Lead not interested: {instance.name} {instance.surname}",
+            'call_back': f"Call back requested for lead: {instance.name} {instance.surname}",
+            'wrong_number': f"Wrong number for lead: {instance.name} {instance.surname}",
+            'wrong_info': f"Incorrect info for lead: {instance.name} {instance.surname}",
+            'hung_up': f"Lead hung up: {instance.nom} {instance.name}",
+            'never_answer': f"Lead never answers: {instance.name} {instance.surname}",
+            'converti': f"Lead converted: {instance.name} {instance.surname}",
         }
 
-        # Définir le type d'événement selon le statut (peut être le même pour tous ou customisé)
+        # Define event type based on status
         event_type = (
-            'converti_lead' if statut == 'converti'
+            'converted_lead' if statut == 'converti'
             else 'lost_lead' if statut in ['not_interested', 'wrong_info', 'hung_up', 'never_answer', 'wrong_number']
-            else 'new_lead'  # Utilisé aussi pour 'new', 'call_back', 'no_answer'
+            else 'new_lead'
         )
 
-        # Créer la notification uniquement si le statut est reconnu
+        # Only create notification if status is recognized
         if statut in messages:
             BitaBoxNotification.objects.create(
                 user=instance.commercial,
@@ -53,7 +53,7 @@ def notify_deleted_lead(sender, instance, **kwargs):
         BitaBoxNotification.objects.create(
             user=instance.commercial,
             event_type='lost_lead',
-            message=f"Lead supprimé : {instance.nom} {instance.prenom}"
+            message=f"Lead deleted: {instance.name} {instance.surname}"
         )
 
 
@@ -64,25 +64,25 @@ def notify_user_created_or_updated(sender, instance, created, **kwargs):
     if created:
         BitaBoxNotification.objects.create(
             user=instance,
-            event_type='new_lead',
-            message=f"Nouvel utilisateur ajouté : {instance.username}"
+            event_type='new_user',
+            message=f"New user added: {instance.username}"
         )
     else:
         BitaBoxNotification.objects.create(
             user=instance,
-            event_type='converti_lead',
-            message=f"Utilisateur mis à jour : {instance.username}"
+            event_type='updated_user',
+            message=f"User updated: {instance.username}"
         )
 
 @receiver(post_delete, sender=User)
 def notify_user_deleted(sender, instance, **kwargs):
-    # On suppose qu'un admin reçoit la notif
+    # Assume that an admin receives the notification
     admins = User.objects.filter(is_superuser=True)
     for admin in admins:
         BitaBoxNotification.objects.create(
             user=admin,
-            event_type='lost_lead',
-            message=f"Utilisateur supprimé : {instance.username}"
+            event_type='lost_user',
+            message=f"User deleted: {instance.username}"
         )
 
 
@@ -90,12 +90,12 @@ def notify_user_deleted(sender, instance, **kwargs):
 
 @receiver(post_save, sender=BitaBoxEntreprise)
 def notify_entreprise_created_or_updated(sender, instance, created, **kwargs):
-    message = f"Nouvelle entreprise : {instance.nom}" if created else f"Entreprise mise à jour : {instance.nom}"
+    message = f"New company: {instance.name}" if created else f"Company updated: {instance.name}"
     admins = User.objects.filter(is_superuser=True)
     for admin in admins:
         BitaBoxNotification.objects.create(
             user=admin,
-            event_type='new_lead',
+            event_type='new_enterprise',
             message=message
         )
 
@@ -105,6 +105,6 @@ def notify_entreprise_deleted(sender, instance, **kwargs):
     for admin in admins:
         BitaBoxNotification.objects.create(
             user=admin,
-            event_type='lost_lead',
-            message=f"Entreprise supprimée : {instance.nom}"
+            event_type='lost_enterprise',
+            message=f"Company deleted: {instance.name}"
         )

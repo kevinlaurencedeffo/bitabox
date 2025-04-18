@@ -77,14 +77,14 @@ class UtilisateursParEntrepriseView(generics.ListAPIView):
 
     def get_queryset(self):
         entreprise_id = self.kwargs.get("entreprise_id")
-        return BitaBoxUtilisateur.objects.filter(entreprise=entreprise_id)
+        return BitaBoxUtilisateur.objects.filter(enterprise=entreprise_id)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         entreprise = BitaBoxEntreprise.objects.get(id=self.kwargs["entreprise_id"])
         serializer = self.get_serializer(queryset, many=True)
         return Response({
-            "entreprise": entreprise.nom,
+            "entreprise": entreprise.name,
             "utilisateurs": serializer.data
         })
 
@@ -165,13 +165,13 @@ class LeadByEntrepriseView(generics.ListAPIView):
 
     def get_queryset(self):
         entreprise_id = self.kwargs.get("entreprise_id")  # Récupérer l'ID de l'entreprise depuis l'URL
-        return BitaBoxLead.objects.filter(entreprise_id=entreprise_id)
+        return BitaBoxLead.objects.filter(enterprise=entreprise_id)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         entreprise = BitaBoxEntreprise.objects.get(id=self.kwargs["entreprise_id"])
         serializer = self.get_serializer(queryset, many=True)
-        return Response({"entreprise": entreprise.nom, "leads": serializer.data})
+        return Response({"entreprise": entreprise.name, "leads": serializer.data})
 
 # 📩 Liste des notifications de l'utilisateur connecté
 class NotificationListView(generics.ListAPIView):
@@ -281,3 +281,31 @@ class DashboardStatsView(APIView):
         if total_leads > 0:
             return (converted_leads / total_leads) * 100
         return 0
+    
+
+
+class AddLeadView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        serializer = LeadSerializer(data=request.data)
+        if serializer.is_valid():
+            lead = serializer.save()
+            return Response({
+                "message": "Lead added successfully",
+                "lead": LeadSerializer(lead).data
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CommentListCreateView(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
