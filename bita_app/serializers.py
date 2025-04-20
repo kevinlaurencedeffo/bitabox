@@ -60,6 +60,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class LeadSerializer(serializers.ModelSerializer):
+    date = serializers.DateField(read_only=True)
+    time = serializers.TimeField(read_only=True)
     comments = serializers.PrimaryKeyRelatedField(
         queryset=BitaboxComment.objects.all(),
         many=True,
