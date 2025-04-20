@@ -81,15 +81,15 @@ class UtilisateursParEntrepriseView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]  # Seuls les utilisateurs connectés peuvent accéder
 
     def get_queryset(self):
-        entreprise_id = self.kwargs.get("entreprise")
+        entreprise_id = self.kwargs.get("enterprise")
         return BitaBoxUtilisateur.objects.filter(enterprise=entreprise_id)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        entreprise = BitaBoxEntreprise.objects.get(id=self.kwargs["entreprise"])
+        entreprise = BitaBoxEntreprise.objects.get(id=self.kwargs["enterprise"])
         serializer = self.get_serializer(queryset, many=True)
         return Response({
-            "entreprise": entreprise.name,
+            "enterprise": entreprise.name,
             "utilisateurs": serializer.data
         })
 
@@ -169,14 +169,14 @@ class LeadByEntrepriseView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]  # Seuls les utilisateurs connectés peuvent voir les leads
 
     def get_queryset(self):
-        entreprise_id = self.kwargs.get("entreprise")  # Récupérer l'ID de l'entreprise depuis l'URL
+        entreprise_id = self.kwargs.get("enterprise")  # Récupérer l'ID de l'entreprise depuis l'URL
         return BitaBoxLead.objects.filter(enterprise=entreprise_id)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        entreprise = BitaBoxEntreprise.objects.get(id=self.kwargs["entreprise"])
+        entreprise = BitaBoxEntreprise.objects.get(id=self.kwargs["enterprise"])
         serializer = self.get_serializer(queryset, many=True)
-        return Response({"entreprise": entreprise.name, "leads": serializer.data})
+        return Response({"enterprise": entreprise.name, "leads": serializer.data})
 
 # 📩 Liste des notifications de l'utilisateur connecté
 class NotificationListView(generics.ListAPIView):
@@ -234,14 +234,14 @@ class DashboardStatsView(APIView):
 
         # Admin entreprise : stats liées à son entreprise
         elif user.is_admin:
-            entreprise = user.entreprise
-            leads = BitaBoxLead.objects.filter(entreprise=entreprise)
+            entreprise = user.enterprise
+            leads = BitaBoxLead.objects.filter(enterprise=entreprise)
             leads_by_status = leads.values('status').annotate(count=Count('id'))
             leads_by_commercial = leads.values('commercial__username').annotate(count=Count('id'))
             recent_leads = leads.order_by('-date')[:5]
 
             total_leads = leads.count()
-            total_commercials = BitaBoxUtilisateur.objects.filter(entreprise=entreprise, is_commercial=True).count()
+            total_commercials = BitaBoxUtilisateur.objects.filter(enterprise=entreprise, is_commercial=True).count()
             total_leads_converted = leads.filter(status="converted").count()
             total_leads_lost = leads.filter(status="lost_lead").count()
 
