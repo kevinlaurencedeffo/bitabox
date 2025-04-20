@@ -29,12 +29,12 @@ def handle_lead_events(sender, instance, created, **kwargs):
             'wrong_info': f"Incorrect info for lead: {instance.name} {instance.surname}",
             'hung_up': f"Lead hung up: {instance.name} {instance.surname}",
             'never_answer': f"Lead never answers: {instance.name} {instance.surname}",
-            'converti': f"Lead converted: {instance.name} {instance.surname}",
+            'converted': f"Lead converted: {instance.name} {instance.surname}",
         }
 
         # Define event type based on status
         event_type = (
-            'converted_lead' if status == 'converti'
+            'converted' if status == 'converted'
             else 'lost_lead' if status in ['not_interested', 'wrong_info', 'hung_up', 'never_answer', 'wrong_number']
             else 'new_lead'
         )

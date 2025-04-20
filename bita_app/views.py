@@ -237,7 +237,7 @@ class DashboardStatsView(APIView):
 
             total_leads = leads.count()
             total_commercials = BitaBoxUtilisateur.objects.filter(entreprise=entreprise, is_commercial=True).count()
-            total_leads_converted = leads.filter(status="converti").count()
+            total_leads_converted = leads.filter(status="converted").count()
             total_leads_lost = leads.filter(status="lost_lead").count()
 
             top_commercials = leads.values('commercial__username').annotate(count=Count('id')).order_by('-count')[:5]
@@ -257,7 +257,7 @@ class DashboardStatsView(APIView):
         elif user.is_commercial:
             leads = BitaBoxLead.objects.filter(commercial=user)
             leads_by_status = leads.values('status').annotate(count=Count('id'))
-            converted = leads.filter(status="converti").count()
+            converted = leads.filter(status="converted").count()
             lost = leads.filter(status="lost_lead").count()
             total_leads = leads.count()
             conversion_rate = self.get_conversion_rate(user)
@@ -276,7 +276,7 @@ class DashboardStatsView(APIView):
 
     def get_conversion_rate(self, commercial):
         total_leads = BitaBoxLead.objects.filter(commercial=commercial).count()
-        converted_leads = BitaBoxLead.objects.filter(commercial=commercial, status="converti").count()
+        converted_leads = BitaBoxLead.objects.filter(commercial=commercial, status="converted").count()
 
         if total_leads > 0:
             return (converted_leads / total_leads) * 100

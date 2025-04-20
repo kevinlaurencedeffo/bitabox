@@ -75,6 +75,7 @@ class BitaBoxLead(models.Model):
         ("wrong_info", "Wrong Info"),
         ("hung_up", "Hung Up"),
         ("never_answer", "Never Answer"),
+        ("converted", "Converted"),
     ]
 
     id = models.AutoField(primary_key=True)
@@ -112,7 +113,7 @@ class BitaBoxNotification(models.Model):
     EVENT_TYPES = [
         ('new_lead', 'New lead'),
         ('lost_lead', 'Lost Lead'),
-        ('converti_lead', 'Converted Lead'),
+        ('converted', 'Converted Lead'),
     ]
 
     id = models.AutoField(primary_key=True)
