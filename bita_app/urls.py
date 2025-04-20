@@ -29,6 +29,9 @@ urlpatterns = [
     path('leads/comments/', CommentListCreateView.as_view(), name='comment-list-create'),
     path('leads/comments/<int:pk>/', CommentDetailView.as_view(), name='comment-detail'),
 
+    path('leads/comments/lead/<int:lead_id>/', CommentairesParLeadView.as_view(), name='commentaires_par_lead'),
+    path('utilisateurs/comments/user/<int:user_id>/', CommentairesParUtilisateurView.as_view(), name='commentaires_par_utilisateur'),
+
     path('notifications/', NotificationListView.as_view(), name='notification-list'),
     path('notifications/<int:pk>/read/', MarkNotificationAsReadView.as_view(), name='mark-notification-read'),
     path('notifications/<int:pk>/delete/', NotificationDeleteView.as_view(), name='notification-delete'),

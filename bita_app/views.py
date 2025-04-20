@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from .models import *
 from .serializers import *
 from rest_framework import status, generics, permissions,viewsets
@@ -8,6 +9,10 @@ from django.contrib.auth.hashers import make_password
 from deep_translator import GoogleTranslator
 from django.db.models import Count,Q
 from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
+
+
+User = get_user_model()
 
 
 class TraductionAPIView(APIView):
@@ -309,3 +314,19 @@ class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = BitaboxComment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class CommentairesParLeadView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, lead_id):
+        lead = get_object_or_404(BitaBoxLead, id=lead_id)
+        commentaires = BitaboxComment.objects.filter(lead_id=lead).order_by('-date', '-time')
+        serializer = CommentSerializer(commentaires, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class CommentairesParUtilisateurView(APIView):
+    def get(self, request, user_id):
+        user = get_object_or_404(User, id=user_id)
+        commentaires = BitaboxComment.objects.filter(user=user).order_by('-date', '-time')
+        serializer = CommentSerializer(commentaires, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
