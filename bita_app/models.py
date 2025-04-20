@@ -105,6 +105,7 @@ class BitaBoxLead(models.Model):
 
     def __str__(self):
         return f"Lead from {self.contact} - {self.status}"
+
 class BitaBoxNotification(models.Model):
     STATUS_CHOICES = [
         ('unread', 'Non lue'),

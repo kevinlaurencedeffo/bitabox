@@ -238,7 +238,7 @@ class DashboardStatsView(APIView):
             leads = BitaBoxLead.objects.filter(entreprise=entreprise)
             leads_by_status = leads.values('status').annotate(count=Count('id'))
             leads_by_commercial = leads.values('commercial__username').annotate(count=Count('id'))
-            recent_leads = leads.order_by('-date_reception')[:5]
+            recent_leads = leads.order_by('-date')[:5]
 
             total_leads = leads.count()
             total_commercials = BitaBoxUtilisateur.objects.filter(entreprise=entreprise, is_commercial=True).count()
@@ -266,7 +266,7 @@ class DashboardStatsView(APIView):
             lost = leads.filter(status="lost_lead").count()
             total_leads = leads.count()
             conversion_rate = self.get_conversion_rate(user)
-            leads_to_follow_up = leads.filter(status="call_back").order_by('-date_reception')[:5]
+            leads_to_follow_up = leads.filter(status="call_back").order_by('-date')[:5]
 
             stats = {
                 'total_leads': total_leads,
