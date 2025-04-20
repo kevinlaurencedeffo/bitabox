@@ -26,11 +26,16 @@ urlpatterns = [
     path("leads/entreprise/<int:entreprise_id>/", LeadByEntrepriseView.as_view(), name="leads_by_entreprise"),
     path('addlead/', AddLeadView.as_view(), name='add_lead'),
 
+    path('comments/', CommentaireFiltreView.as_view(), name='commentaires_filtrés'),
+
+
     path('leads/comments/', CommentListCreateView.as_view(), name='comment-list-create'),
     path('leads/comments/<int:pk>/', CommentDetailView.as_view(), name='comment-detail'),
 
     path('leads/comments/lead/<int:lead_id>/', CommentairesParLeadView.as_view(), name='commentaires_par_lead'),
     path('utilisateurs/comments/user/<int:user_id>/', CommentairesParUtilisateurView.as_view(), name='commentaires_par_utilisateur'),
+    path('comments/add/', AjouterCommentaireView.as_view(), name='ajouter_commentaire'),
+
 
     path('notifications/', NotificationListView.as_view(), name='notification-list'),
     path('notifications/<int:pk>/read/', MarkNotificationAsReadView.as_view(), name='mark-notification-read'),

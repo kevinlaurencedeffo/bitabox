@@ -325,8 +325,55 @@ class CommentairesParLeadView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class CommentairesParUtilisateurView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def get(self, request, user_id):
         user = get_object_or_404(User, id=user_id)
         commentaires = BitaboxComment.objects.filter(user=user).order_by('-date', '-time')
         serializer = CommentSerializer(commentaires, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class CommentaireFiltreView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        lead_id = request.GET.get('lead_id')
+        user_id = request.GET.get('user_id')
+
+        commentaires = BitaboxComment.objects.all()
+
+        if lead_id:
+            commentaires = commentaires.filter(lead_id=lead_id)
+        if user_id:
+            commentaires = commentaires.filter(user_id=user_id)
+
+        commentaires = commentaires.order_by('-date', '-time')
+        serializer = CommentSerializer(commentaires, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class AjouterCommentaireView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        lead_id = request.data.get('lead_id')
+        message = request.data.get('message')
+
+        if not all([lead_id, message]):
+            return Response(
+                {"error": "Les champs 'lead_id' et 'message' sont requis."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            lead = BitaBoxLead.objects.get(id=lead_id)
+        except BitaBoxLead.DoesNotExist:
+            return Response({"error": "Lead introuvable."}, status=status.HTTP_404_NOT_FOUND)
+
+        commentaire = BitaboxComment.objects.create(
+            lead_id=lead,
+            user=request.user,
+            message=message
+        )
+
+        serializer = CommentSerializer(commentaire)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
