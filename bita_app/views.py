@@ -137,12 +137,12 @@ class EntrepriseRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
 # 🎯 Gestion des leads
 class LeadListCreateView(generics.ListCreateAPIView):
-    queryset = BitaBoxLead.objects.all()
+    queryset = BitaBoxLead.objects.all().order_by('-date')
     serializer_class = LeadSerializer
     permission_classes = [permissions.IsAuthenticated]  # 🔒 Auth obligatoire
 
 class LeadRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = BitaBoxLead.objects.all()
+    queryset = BitaBoxLead.objects.all().order_by('-date')
     serializer_class = LeadSerializer
     permission_classes = [permissions.IsAuthenticated]  # 🔒 Auth obligatoire
 

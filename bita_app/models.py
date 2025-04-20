@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
-from django.utils import timezone
 import string
 import random
 
@@ -89,8 +88,8 @@ class BitaBoxLead(models.Model):
     commercial = models.ForeignKey(BitaBoxUtilisateur, on_delete=models.SET_NULL, null=True, blank=True)
 
     # ✅ Newly added fields
-    date = models.DateField(default=timezone.now)
-    time = models.TimeField(default=timezone.now)
+    date = models.DateField(auto_now_add=True)
+    time = time = models.TimeField(auto_now_add=True)
     country = models.CharField(max_length=100, blank=True, null=True)
     language = models.CharField(max_length=100, blank=True, null=True)
     id_lead = models.CharField(max_length=8, default=generate_lead_id, editable=False, unique=True)
@@ -101,6 +100,7 @@ class BitaBoxLead(models.Model):
     class Meta:
         verbose_name = "Bitabox Lead"
         verbose_name_plural = "Bitabox Leads"
+        ordering = ['-date']
 
     def __str__(self):
         return f"Lead from {self.contact} - {self.status}"
