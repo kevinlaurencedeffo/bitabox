@@ -214,7 +214,7 @@ class DashboardStatsView(APIView):
             entreprises_count = BitaBoxEntreprise.objects.count()
             utilisateurs_count = BitaBoxUtilisateur.objects.count()
             leads_count = BitaBoxLead.objects.count()
-            leads_by_status = BitaBoxLead.objects.values('statut').annotate(count=Count('id'))
+            leads_by_status = BitaBoxLead.objects.values('status').annotate(count=Count('id'))
             top_entreprises = BitaBoxEntreprise.objects.annotate(lead_count=Count('leads')).order_by('-lead_count')[:5]
             notifications_count = BitaBoxNotification.objects.count()
 
@@ -231,14 +231,14 @@ class DashboardStatsView(APIView):
         elif user.is_admin:
             entreprise = user.entreprise
             leads = BitaBoxLead.objects.filter(entreprise=entreprise)
-            leads_by_status = leads.values('statut').annotate(count=Count('id'))
+            leads_by_status = leads.values('status').annotate(count=Count('id'))
             leads_by_commercial = leads.values('commercial__username').annotate(count=Count('id'))
             recent_leads = leads.order_by('-date_reception')[:5]
 
             total_leads = leads.count()
             total_commercials = BitaBoxUtilisateur.objects.filter(entreprise=entreprise, is_commercial=True).count()
-            total_leads_converted = leads.filter(statut="converti").count()
-            total_leads_lost = leads.filter(statut="lost_lead").count()
+            total_leads_converted = leads.filter(status="converti").count()
+            total_leads_lost = leads.filter(status="lost_lead").count()
 
             top_commercials = leads.values('commercial__username').annotate(count=Count('id')).order_by('-count')[:5]
 
@@ -250,18 +250,18 @@ class DashboardStatsView(APIView):
                 'leads_by_status': list(leads_by_status),
                 'leads_by_commercial': list(leads_by_commercial),
                 'top_commercials': list(top_commercials),
-                'recent_leads': [{'name': lead.name, 'surname': lead.surname, 'statut': lead.statut} for lead in recent_leads]
+                'recent_leads': [{'name': lead.name, 'surname': lead.surname, 'status': lead.status} for lead in recent_leads]
             }
 
         # Commercial : accès à ses propres leads
         elif user.is_commercial:
             leads = BitaBoxLead.objects.filter(commercial=user)
-            leads_by_status = leads.values('statut').annotate(count=Count('id'))
-            converted = leads.filter(statut="converti").count()
-            lost = leads.filter(statut="lost_lead").count()
+            leads_by_status = leads.values('status').annotate(count=Count('id'))
+            converted = leads.filter(status="converti").count()
+            lost = leads.filter(status="lost_lead").count()
             total_leads = leads.count()
             conversion_rate = self.get_conversion_rate(user)
-            leads_to_follow_up = leads.filter(statut="call_back").order_by('-date_reception')[:5]
+            leads_to_follow_up = leads.filter(status="call_back").order_by('-date_reception')[:5]
 
             stats = {
                 'total_leads': total_leads,
@@ -276,7 +276,7 @@ class DashboardStatsView(APIView):
 
     def get_conversion_rate(self, commercial):
         total_leads = BitaBoxLead.objects.filter(commercial=commercial).count()
-        converted_leads = BitaBoxLead.objects.filter(commercial=commercial, statut="converti").count()
+        converted_leads = BitaBoxLead.objects.filter(commercial=commercial, status="converti").count()
 
         if total_leads > 0:
             return (converted_leads / total_leads) * 100

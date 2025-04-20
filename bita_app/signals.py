@@ -19,7 +19,7 @@ def handle_lead_events(sender, instance, created, **kwargs):
             message=f"New lead: {instance.name} {instance.surname}"
         )
     else:
-        statut = instance.status
+        status = instance.status
         messages = {
             'Initial Call': f"Lead initialized: {instance.name} {instance.surname}",
             'no_answer': f"No answer from lead: {instance.name} {instance.surname}",
@@ -34,17 +34,17 @@ def handle_lead_events(sender, instance, created, **kwargs):
 
         # Define event type based on status
         event_type = (
-            'converted_lead' if statut == 'converti'
-            else 'lost_lead' if statut in ['not_interested', 'wrong_info', 'hung_up', 'never_answer', 'wrong_number']
+            'converted_lead' if status == 'converti'
+            else 'lost_lead' if status in ['not_interested', 'wrong_info', 'hung_up', 'never_answer', 'wrong_number']
             else 'new_lead'
         )
 
         # Only create notification if status is recognized
-        if statut in messages:
+        if status in messages:
             BitaBoxNotification.objects.create(
                 user=instance.commercial,
                 event_type=event_type,
-                message=messages[statut]
+                message=messages[status]
             )
 
 @receiver(post_delete, sender=BitaBoxLead)
