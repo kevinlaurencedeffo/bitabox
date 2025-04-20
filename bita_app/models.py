@@ -46,6 +46,7 @@ class BitaBoxEntreprise(models.Model):
 class BitaboxComment(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(BitaBoxUtilisateur, on_delete=models.CASCADE)
+    lead_id = models.ForeignKey("BitaBoxLead", on_delete=models.CASCADE)
     message = models.TextField()
     date = models.DateField(auto_now_add=True)
     time = models.TimeField(auto_now_add=True)
