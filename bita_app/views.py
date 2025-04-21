@@ -109,10 +109,30 @@ class CreerUtilisateurView(generics.CreateAPIView):
         serializer.save(password=make_password(password))  # Hash du mot de passe
 
 class DetailUtilisateurView(generics.RetrieveUpdateDestroyAPIView):
-    """Voir, mettre à jour ou supprimer un utilisateur"""
+    """
+    Voir, mettre à jour ou supprimer un utilisateur.
+    Si un champ 'password' est envoyé, le mot de passe est mis à jour.
+    """
     queryset = BitaBoxUtilisateur.objects.all()
     serializer_class = UtilisateurSerializer
-    permission_classes = [IsAdminOrSuperuser]  # Seuls les admins peuvent modifier/supprimer
+    permission_classes = [IsAdminOrSuperuser]
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+
+        # Vérifie s'il y a un mot de passe à mettre à jour
+        password = request.data.get("password", None)
+
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        # Mise à jour du mot de passe si présent
+        if password:
+            instance.set_password(password)
+            instance.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ChangePasswordView(APIView):
     """Changer le mot de passe d'un utilisateur"""
@@ -237,7 +257,7 @@ class DashboardStatsView(APIView):
             entreprise = user.enterprise
             leads = BitaBoxLead.objects.filter(enterprise=entreprise)
             leads_by_status = leads.values('status').annotate(count=Count('id'))
-            leads_by_commercial = leads.values('commercial__username').annotate(count=Count('id'))
+            leads_by_commercial = leads.values('commercial').annotate(count=Count('id'))
             recent_leads = leads.order_by('-date')[:5]
 
             total_leads = leads.count()
@@ -245,7 +265,7 @@ class DashboardStatsView(APIView):
             total_leads_converted = leads.filter(status="converted").count()
             total_leads_lost = leads.filter(status="lost_lead").count()
 
-            top_commercials = leads.values('commercial__username').annotate(count=Count('id')).order_by('-count')[:5]
+            top_commercials = leads.values('commercial').annotate(count=Count('id')).order_by('-count')[:5]
 
             stats = {
                 'total_leads': total_leads,
