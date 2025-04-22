@@ -92,6 +92,7 @@ class BitaBoxLead(models.Model):
     date = models.DateField(auto_now_add=True)
     time = time = models.TimeField(auto_now_add=True)
     country = models.CharField(max_length=100, blank=True, null=True)
+    call_code = models.CharField(max_length=100, blank=True, null=True)
     language = models.CharField(max_length=100, blank=True, null=True)
     id_lead = models.CharField(max_length=8, default=generate_lead_id, editable=False, unique=True)
 
