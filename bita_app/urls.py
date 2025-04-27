@@ -24,7 +24,7 @@ urlpatterns = [
     path('leads/<int:pk>/', LeadRetrieveUpdateDeleteView.as_view(), name='lead-detail'),
     path("leads/commercial/", LeadByCommercialView.as_view(), name="leads_by_commercial"),
     path("leads/entreprise/<int:entreprise_id>/", LeadByEntrepriseView.as_view(), name="leads_by_entreprise"),
-    path('addlead/', AddLeadView.as_view(), name='add_lead'),
+    path('addlead/<int:enterprise_id>/<int:commercial_id>/', AddLeadView.as_view(), name='add-lead'),
 
     path('comments/', CommentaireFiltreView.as_view(), name='commentaires_filtrés'),
 

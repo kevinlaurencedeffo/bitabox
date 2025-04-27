@@ -310,18 +310,24 @@ class DashboardStatsView(APIView):
 
 
 class AddLeadView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    def post(self, request, enterprise_id, commercial_id):
+        try:
+            entreprise = BitaBoxEntreprise.objects.get(id=enterprise_id)
+            commercial = BitaBoxUtilisateur.objects.get(id=commercial_id)
+        except BitaBoxEntreprise.DoesNotExist:
+            return Response({"error": "Enterprise not found"}, status=status.HTTP_404_NOT_FOUND)
+        except BitaBoxUtilisateur.DoesNotExist:
+            return Response({"error": "Commercial user not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    def post(self, request):
         serializer = LeadSerializer(data=request.data)
         if serializer.is_valid():
-            lead = serializer.save()
+            lead = serializer.save(enterprise=entreprise, commercial=commercial)
             return Response({
                 "message": "Lead added successfully",
                 "lead": LeadSerializer(lead).data
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    
 class CommentListCreateView(generics.ListCreateAPIView):
     queryset = BitaboxComment.objects.all()
     serializer_class = CommentSerializer
