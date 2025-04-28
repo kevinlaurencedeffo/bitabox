@@ -11,6 +11,7 @@ from django.db.models import Count,Q
 from django.contrib.auth.models import Group
 from django.utils.dateparse import parse_date
 from django.contrib.auth import get_user_model
+from rest_framework.exceptions import ValidationError
 
 
 User = get_user_model()
@@ -165,7 +166,20 @@ class EntrepriseRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 class LeadListCreateView(generics.ListCreateAPIView):
     queryset = BitaBoxLead.objects.all().order_by('-date')
     serializer_class = LeadSerializer
-    permission_classes = [permissions.IsAuthenticated]  # 🔒 Auth obligatoire
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        contact = self.request.data.get('contact')
+        email = self.request.data.get('email')
+
+        if contact and BitaBoxLead.objects.filter(contact=contact).exists():
+            raise ValidationError({"error": "A lead with this phone number already exists."})
+
+        if email and BitaBoxLead.objects.filter(email=email).exists():
+            raise ValidationError({"error": "A lead with this email address already exists."})
+
+        serializer.save()
+
 
 class LeadRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = BitaBoxLead.objects.all().order_by('-date')
@@ -317,14 +331,25 @@ class AddLeadView(APIView):
         try:
             entreprise = BitaBoxEntreprise.objects.get(id=enterprise_id)
             commercial = BitaBoxUtilisateur.objects.get(id=commercial_id)
+            author = BitaBoxUtilisateur.objects.get(id=commercial_id)
         except BitaBoxEntreprise.DoesNotExist:
             return Response({"error": "Enterprise not found"}, status=status.HTTP_404_NOT_FOUND)
         except BitaBoxUtilisateur.DoesNotExist:
             return Response({"error": "Commercial user not found"}, status=status.HTTP_404_NOT_FOUND)
 
+        # Vérification de doublon numéro ou email
+        contact = request.data.get('contact')
+        email = request.data.get('email')
+
+        if contact and BitaBoxLead.objects.filter(contact=contact).exists():
+            return Response({"error": "A lead with this phone number already exists."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if email and BitaBoxLead.objects.filter(email=email).exists():
+            return Response({"error": "A lead with this email address already exists."}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = LeadSerializer(data=request.data)
         if serializer.is_valid():
-            lead = serializer.save(enterprise=entreprise, commercial=commercial)
+            lead = serializer.save(enterprise=entreprise, commercial=commercial, author=author)
             return Response({
                 "message": "Lead added successfully",
                 "lead": LeadSerializer(lead).data
@@ -332,6 +357,9 @@ class AddLeadView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LeadByAuthorView(APIView):
+    permission_classes = [permissions.AllowAny]
+    queryset = BitaBoxLead.objects.all().order_by('-date')
+
 
     def get(self, request, author_id):
         leads = BitaBoxLead.objects.filter(author__id=author_id)
