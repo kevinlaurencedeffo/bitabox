@@ -73,6 +73,7 @@ class BitaBoxLead(models.Model):
         ("call_back", "Call Back"),
         ("wrong_number", "Wrong Number"),
         ("wrong_info", "Wrong Info"),
+        ("invalid", "Invalid"),
         ("hung_up", "Hung Up"),
         ("never_answer", "Never Answer"),
         ("converted", "Converted"),
