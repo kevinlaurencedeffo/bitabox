@@ -5,12 +5,16 @@ import string
 import random
 
 
+def generate_id():
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=12))
 
 class BitaBoxUtilisateur(AbstractUser):
     id = models.AutoField(primary_key=True)  # ✅ Auto-incrémentation
     enterprise = models.ForeignKey("BitaBoxEntreprise", on_delete=models.CASCADE, null=True, blank=True)
     is_admin = models.BooleanField(default=False)
     is_commercial = models.BooleanField(default=False)
+    id_user = models.CharField(max_length=8, default=generate_id, editable=False, unique=True)
+
 
     groups = models.ManyToManyField(
         Group,
@@ -61,8 +65,6 @@ class BitaboxComment(models.Model):
         return f"{self.user.username} - {self.date} {self.time}"
     
 
-def generate_lead_id():
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
 class BitaBoxLead(models.Model):
     STATUS_CHOICES = [
@@ -96,7 +98,7 @@ class BitaBoxLead(models.Model):
     country = models.CharField(max_length=100, blank=True, null=True)
     call_code = models.CharField(max_length=100, blank=True, null=True)
     language = models.CharField(max_length=100, blank=True, null=True)
-    id_lead = models.CharField(max_length=8, default=generate_lead_id, editable=False, unique=True)
+    id_lead = models.CharField(max_length=8, default=generate_id, editable=False, unique=True)
 
     # ✅ Comments relation
     comments = models.ManyToManyField(BitaboxComment, related_name="lead_comments", blank=True)

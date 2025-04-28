@@ -331,11 +331,19 @@ class AddLeadView(APIView):
         try:
             entreprise = BitaBoxEntreprise.objects.get(id=enterprise_id)
             commercial = BitaBoxUtilisateur.objects.get(id=commercial_id)
-            author = BitaBoxUtilisateur.objects.get(id=commercial_id)
         except BitaBoxEntreprise.DoesNotExist:
             return Response({"error": "Enterprise not found"}, status=status.HTTP_404_NOT_FOUND)
         except BitaBoxUtilisateur.DoesNotExist:
             return Response({"error": "Commercial user not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        id_user = request.GET.get('id_user')
+        author_id = commercial_id  # Parce que tu utilises commercial_id comme author_id
+
+        # Vérification que le user existe avec ce id_user ET ce id
+        try:
+            author = BitaBoxUtilisateur.objects.get(id=author_id, id_user=id_user)
+        except BitaBoxUtilisateur.DoesNotExist:
+            return Response({"error": "User not found or invalid credentials."}, status=status.HTTP_404_NOT_FOUND)
 
         # Vérification de doublon numéro ou email
         contact = request.data.get('contact')
@@ -358,10 +366,16 @@ class AddLeadView(APIView):
 
 class LeadByAuthorView(APIView):
     permission_classes = [permissions.AllowAny]
-    queryset = BitaBoxLead.objects.all().order_by('-date')
-
 
     def get(self, request, author_id):
+        id_user = request.GET.get('id_user')
+
+        # Vérification que le user existe avec ce id_user ET ce id
+        try:
+            user = BitaBoxUtilisateur.objects.get(id=author_id, id_user=id_user)
+        except BitaBoxUtilisateur.DoesNotExist:
+            return Response({"error": "User not found or invalid credentials."}, status=status.HTTP_404_NOT_FOUND)
+
         leads = BitaBoxLead.objects.filter(author__id=author_id)
 
         # Récupérer les paramètres de date depuis l'URL (optionnels)
@@ -382,6 +396,7 @@ class LeadByAuthorView(APIView):
 
         serializer = LeadSerializer(leads, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class CommentListCreateView(generics.ListCreateAPIView):
     queryset = BitaboxComment.objects.all()
