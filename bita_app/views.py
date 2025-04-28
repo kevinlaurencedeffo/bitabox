@@ -310,6 +310,8 @@ class DashboardStatsView(APIView):
 
 
 class AddLeadView(APIView):
+    permission_classes = [permissions.AllowAny]
+
     def post(self, request, enterprise_id, commercial_id):
         try:
             entreprise = BitaBoxEntreprise.objects.get(id=enterprise_id)
@@ -327,7 +329,15 @@ class AddLeadView(APIView):
                 "lead": LeadSerializer(lead).data
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+class LeadByAuthorView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, author_id):
+        leads = BitaBoxLead.objects.filter(author__id=author_id)
+        serializer = LeadSerializer(leads, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 class CommentListCreateView(generics.ListCreateAPIView):
     queryset = BitaboxComment.objects.all()
     serializer_class = CommentSerializer

@@ -25,6 +25,7 @@ urlpatterns = [
     path("leads/commercial/", LeadByCommercialView.as_view(), name="leads_by_commercial"),
     path("leads/entreprise/<int:entreprise_id>/", LeadByEntrepriseView.as_view(), name="leads_by_entreprise"),
     path('addlead/<int:enterprise_id>/<int:commercial_id>/', AddLeadView.as_view(), name='add-lead'),
+    path('leads/author/<int:author_id>/', LeadByAuthorView.as_view(), name='leads-by-author'),
 
     path('comments/', CommentaireFiltreView.as_view(), name='commentaires_filtrés'),
 
