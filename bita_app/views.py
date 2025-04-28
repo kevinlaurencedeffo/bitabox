@@ -9,6 +9,7 @@ from django.contrib.auth.hashers import make_password
 from deep_translator import GoogleTranslator
 from django.db.models import Count,Q
 from django.contrib.auth.models import Group
+from django.utils.dateparse import parse_date
 from django.contrib.auth import get_user_model
 
 
@@ -331,10 +332,26 @@ class AddLeadView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LeadByAuthorView(APIView):
-    permission_classes = [permissions.AllowAny]
 
     def get(self, request, author_id):
         leads = BitaBoxLead.objects.filter(author__id=author_id)
+
+        # Récupérer les paramètres de date depuis l'URL (optionnels)
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+
+        # Filtrer par plage de dates si les deux sont fournis
+        if start_date and end_date:
+            try:
+                start = parse_date(start_date)
+                end = parse_date(end_date)
+                if start and end:
+                    leads = leads.filter(date__range=(start, end))
+                else:
+                    return Response({"error": "Invalid date format. Use YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = LeadSerializer(leads, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
