@@ -89,8 +89,8 @@ class BitaBoxLead(models.Model):
     contact = models.CharField(max_length=100)
     email = models.EmailField(blank=True, null=True)
     status = models.CharField(max_length=100, choices=STATUS_CHOICES, default="new")
-    commercial = models.ForeignKey(BitaBoxUtilisateur, on_delete=models.SET_NULL, null=True, blank=True)
-    author = models.ForeignKey(BitaBoxUtilisateur, on_delete=models.SET_NULL, null=True, blank=True)
+    commercial = models.ForeignKey(BitaBoxUtilisateur, on_delete=models.SET_NULL, null=True, blank=True,related_name="lead_commercial")
+    author = models.ForeignKey(BitaBoxUtilisateur, on_delete=models.SET_NULL, null=True, blank=True,related_name="lead_author")
 
     # ✅ Newly added fields
     date = models.DateField(auto_now_add=True)
