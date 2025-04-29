@@ -71,6 +71,8 @@ class LeadSerializer(serializers.ModelSerializer):
     class Meta:
         model = BitaBoxLead
         fields = "__all__"
+        read_only_fields = ['enterprise', 'commercial', 'author', 'date', 'time', 'id_lead']
+
 
 
 class NotificationSerializer(serializers.ModelSerializer):
